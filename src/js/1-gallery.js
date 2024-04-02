@@ -1,3 +1,5 @@
+'use strict';
+
 const images = [
   {
     preview:
@@ -64,31 +66,19 @@ const images = [
   },
 ];
 
+const gallery = document.querySelector('.gallery');
+const markup = images
+  .flatMap(
+    ({ preview, original, description }) =>
+      `<li class="gallery-item"> <a class="gallery-link" href="${original}"> <img class="gallery-image" src="${preview}" alt="${description}"/> </a> </li>`
+  )
+  .join('');
+gallery.insertAdjacentHTML('afterbegin', markup);
+
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-const galleryEl = document.querySelector("ul.gallery");
-galleryEl.insertAdjacentHTML("beforeend", galleryItemEl(images));
-
-function galleryItemEl(arr) {
-  return arr
-    .map(
-      ({ preview, original, description }) => `
-  <li class="gallery-item">
-    <a class="gallery-link" href="${original}">
-    <img class="gallery-image" src="${preview}" data-source="${original}" alt="${description}"/>
-    </a>
-  </li>
-  `).join("");
-}  
-
-galleryEl.addEventListener("click", (e) => {
-  if (e.target.tagName !== "IMG") return; // перевірка кліку не на картку
-  e.preventDefault(); // відміна стандартної дії браузера (в один момент загубив строку, а він все скачує і скачує, скажений :) )
-  const currentImage = e.target.closest(".gallery-image");
-  if (!currentImage) return; // перевірка, чи знайдено зображення
-  const imageId = currentImage.dataset.source;
-  const imageCard = images.find(({ original }) => original === imageId);
-  const instance = basicLightbox.create(`<img src="${imageCard.original}" alt="${imageCard.description}"/>`);
-  instance.show();
+const lightbox = new SimpleLightbox('.gallery-link', {
+  captionsData: 'alt',
+  captionsDelay: 250,
 });
